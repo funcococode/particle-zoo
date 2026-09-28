@@ -1,17 +1,28 @@
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Doodle from './components/Doodle'
+import DecayChains from './components/DecayChains'
+import HadronLab from './components/HadronLab'
+import Interactions from './components/Interactions'
 import Quiz from './components/Quiz'
 import Zoo from './components/Zoo'
 import { byId } from './data/particles'
 
 const TABS = [
   { id: 'zoo', label: 'The Zoo' },
-  { id: 'quiz', label: 'Which particle am I?' },
+  { id: 'lab', label: 'Hadron Lab' },
+  { id: 'interactions', label: 'Interactions' },
+  { id: 'decays', label: 'Decay Chains' },
+  { id: 'quiz', label: 'Quiz' },
 ]
 
-// the hash keeps the tab shareable: /#quiz opens straight into the quiz
-const fromHash = () => (window.location.hash === '#quiz' ? 'quiz' : 'zoo')
+const VIEWS = { zoo: Zoo, lab: HadronLab, interactions: Interactions, decays: DecayChains, quiz: Quiz }
+
+// the hash keeps each tab shareable, e.g. /#lab opens straight into the Hadron Lab
+const fromHash = () => {
+  const h = window.location.hash.slice(1)
+  return VIEWS[h] ? h : 'zoo'
+}
 
 export default function App() {
   const [tab, setTab] = useState(fromHash)
@@ -23,7 +34,7 @@ export default function App() {
   }, [])
 
   const go = (id) => {
-    window.location.hash = id === 'quiz' ? 'quiz' : ''
+    window.location.hash = id === 'zoo' ? '' : id
     setTab(id)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -41,7 +52,10 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.35 }}
           >
-            {tab === 'zoo' ? <Zoo /> : <Quiz />}
+            {(() => {
+              const View = VIEWS[tab]
+              return <View />
+            })()}
           </motion.main>
         </AnimatePresence>
         <Footer />
@@ -58,9 +72,9 @@ function Header({ tab, go }) {
         <span className="display text-2xl font-semibold">Particle Zoo</span>
       </button>
       <LayoutGroup id="tabs">
-        <nav className="flex rounded-full border-[3px] border-ink bg-paper p-1" aria-label="Mode">
+        <nav className="flex max-w-full overflow-x-auto rounded-full border-[3px] border-ink bg-paper p-1" aria-label="Mode">
           {TABS.map((t) => (
-            <button key={t.id} onClick={() => go(t.id)} aria-current={tab === t.id} className="relative rounded-full px-4 py-1.5 text-sm font-semibold">
+            <button key={t.id} onClick={() => go(t.id)} aria-current={tab === t.id} className="relative shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-semibold">
               {tab === t.id && (
                 <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />
               )}
@@ -84,6 +98,49 @@ function Logo() {
   )
 }
 
+const HERO = {
+  zoo: {
+    title: (
+      <>
+        The <em className="italic">Particle</em> Zoo
+      </>
+    ),
+    text: 'Meet the 17 residents of the Standard Model — the quarks, leptons and bosons that everything is made of. Flip a card to see what makes each one tick.',
+  },
+  lab: {
+    title: (
+      <>
+        Hadron <em className="italic">Lab</em>
+      </>
+    ),
+    text: 'Quarks never live alone. Drop them into the bag to build protons, pions and exotic hadrons — then try pulling one out.',
+  },
+  interactions: {
+    title: (
+      <>
+        How particles <em className="italic">talk</em>
+      </>
+    ),
+    text: 'Every force is particles swapping other particles. Pick a process and watch its Feynman diagram play out, step by step.',
+  },
+  decays: {
+    title: (
+      <>
+        Decay <em className="italic">chains</em>
+      </>
+    ),
+    text: 'Heavy particles fall apart almost instantly. Start with a Higgs or a top quark and follow it all the way down to what a detector actually sees.',
+  },
+  quiz: {
+    title: (
+      <>
+        Which particle <em className="italic">am I?</em>
+      </>
+    ),
+    text: 'Read the clues, guess the silhouette. Fewer clues, more points — ten particles per round.',
+  },
+}
+
 function Hero({ tab }) {
   const cast = ['up', 'electron', 'photon', 'higgs', 'nu-e', 'gluon']
   return (
@@ -91,21 +148,9 @@ function Hero({ tab }) {
       <div>
         <p className="hand text-2xl opacity-70">a field guide to everything that exists (so far)</p>
         <h1 className="display mt-1 text-6xl font-semibold leading-[0.95] md:text-8xl">
-          {tab === 'quiz' ? (
-            <>
-              Which particle <em className="italic">am I?</em>
-            </>
-          ) : (
-            <>
-              The <em className="italic">Particle</em> Zoo
-            </>
-          )}
+          {HERO[tab].title}
         </h1>
-        <p className="mt-4 max-w-lg text-lg opacity-80">
-          {tab === 'quiz'
-            ? 'Read the clues, guess the silhouette. Fewer clues, more points — ten particles per round.'
-            : 'Meet the 17 residents of the Standard Model — the quarks, leptons and bosons that everything is made of. Flip a card to see what makes each one tick.'}
-        </p>
+        <p className="mt-4 max-w-lg text-lg opacity-80">{HERO[tab].text}</p>
       </div>
       <div className="relative hidden h-64 md:block" aria-hidden>
         {cast.map((id, i) => (
