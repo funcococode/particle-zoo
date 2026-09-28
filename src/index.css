@@ -1,0 +1,67 @@
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource/caveat/600.css';
+@import 'tailwindcss';
+
+@theme {
+  --color-paper: #f4efe4;
+  --color-paper-2: #ebe4d4;
+  --color-ink: #1b1a17;
+  --color-quark: #d9485f;
+  --color-lepton: #2f9e6f;
+  --color-gauge: #e8913a;
+  --color-scalar: #c99a12;
+
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    font-family: var(--font-sans);
+    /* field-guide dot grid */
+    background-image: radial-gradient(color-mix(in srgb, var(--color-ink) 12%, transparent) 1px, transparent 1px);
+    background-size: 22px 22px;
+    min-height: 100vh;
+  }
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .display {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 100, 'WONK' 1;
+    letter-spacing: -0.02em;
+  }
+  .hand {
+    font-family: var(--font-hand);
+  }
+  .chip {
+    @apply rounded-full border-2 border-ink px-3 py-1 text-sm font-medium;
+  }
+  .shadow-ink {
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+  }
+  .shadow-ink-lg {
+    box-shadow: 7px 7px 0 0 var(--color-ink);
+  }
+}
+
+/* 3D flip helpers */
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
